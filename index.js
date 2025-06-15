@@ -6,16 +6,25 @@ const { attachJWTT, verifyJWTT } = require("./lib/jwttHandler");
 /**
  * Initializes the CSRFX middleware with optional configurations
  * @param {Object} config - Configuration options
- * @param {number} config.tokenTTL_RN - CSRF_TN_RN token lifetime in ms (default: 900000)
- * @param {number} config.tokenTTL_UR - CSRF_UR token lifetime in ms (default: 1200000)
+ * @param {number} config.csrf_nav_ttl - csrf_nav token lifetime in ms (default: 900000)
+ * @param {number} config.csrf_sess_ttl - csrf_sess token lifetime in ms (default: 1200000)
+ * @param {string} config.authPath - The path for the protected routes
+ * @param {boolean} config.attachTokens - Attaching tokens to responses via cookies (default: false)
  * @param {function} config.getUserSession - Callback to extract user session info (for CSRF_UR)
  * @returns {Function} Express middleware function
  */
 
 
 function csrfx(config = {}) {
-    const tokenTTL_RN = config.tokenTTL_RN || 15 * 60 * 1000;
-    const tokenTTL_UR = config.tokenTTL_UR || 20 * 60 * 1000;
+    const csrf_nav_ttl = config.csrf_nav_ttl || 15 * 60 * 1000;
+    const csrf_sess_ttl = config.csrf_sess_ttl || 20 * 60 * 1000;
+    const at = config.attachTokens || false;
+    const authPath = config.authPath;
+
+    if (!authPath) {
+        throw new Error("authPath must be provided.")
+    }
+
     const getUserSession = config.getUserSession || (() => null);
 
 
